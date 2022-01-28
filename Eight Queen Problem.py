@@ -1,70 +1,70 @@
 import numpy as np
 import random as rd
 
-satranç_tahtası = np.arange(1, 65).reshape(8, 8)
+chess_board = np.arange(1, 65).reshape(8, 8)
 
-def veziri_yerleştir(vezirin_konumu):
-    yasaklı_karelere_ekle(vezirin_konumu)
+def put_queen(position_of_queen):
+    add_to_banned_pieces(position_of_queen)
 
-def yasaklı_karelere_ekle(vezirin_konumu):
-    konumy = np.where(satranç_tahtası == vezirin_konumu)[1][0]
-    for çapraz_sol in range(vezirin_konumu - (konumy * 9), vezirin_konumu + 1 + ((7-konumy)*9), 9):
-        if 65 > çapraz_sol > 0:
-            yasaklı_kareler.add(çapraz_sol)
-    for çapraz_sağ in range(vezirin_konumu - ((7-konumy) * 7), vezirin_konumu + 1 + (konumy*7), 7):
-        if 65 > çapraz_sağ > 0:
-            yasaklı_kareler.add(çapraz_sağ)
+def add_to_banned_pieces(position_of_queen):
+    position_y = np.where(chess_board == position_of_queen)[1][0]
+    for left_cross in range(position_of_queen - (position_y * 9), position_of_queen + 1 + ((7-position_y)*9), 9):
+        if 65 > left_cross > 0:
+            banned_pieces.add(left_cross)
+    for right_cross in range(position_of_queen - ((7-position_y) * 7), position_of_queen + 1 + (position_y*7), 7):
+        if 65 > right_cross > 0:
+            banned_pieces.add(right_cross)
 
-    for yatay in satranç_tahtası:
-        if vezirin_konumu in yatay:
-            for yataydaki_kare in yatay:
-                yasaklı_kareler.add(yataydaki_kare)
+    for horizontal in chess_board:
+        if position_of_queen in horizontal:
+            for piece_in_horizontal in horizontal:
+                banned_pieces.add(piece_in_horizontal)
             
-            for dikeydeki_kareler in range(len(satranç_tahtası)):
-                yasaklı_kareler.add(satranç_tahtası[dikeydeki_kareler, konumy])
+            for piece_in_vertical in range(len(chess_board)):
+                banned_pieces.add(chess_board[piece_in_vertical, position_y])
 
-def satranç_kordinatına_dönüştür(array1, array2):
-    son_hal = []
-    dikeyler = "habcdefg"
-    for yatay, dikey in zip(array1, array2):
-        son_hal.append(f"{dikeyler[(dikey % 8)]}{8 - yatay}")
+def convert_to_chess_coordinate(array1, array2):
+    finale_state = []
+    verticals = "habcdefg"
+    for horizontal, vertical in zip(array1, array2):
+        finale_state.append(f"{verticals[(vertical % 8)]}{8 - horizontal}")
     
-    print("{} kere deneme yapıldı".format(deneme_sayısı + 1))
-    print(satranç_tahtası)
-    print(vezirlerin_konumu)
+    print("It have been tried {} times.".format(num_of_attempt + 1))
+    print(chess_board)
+    print(positions_of_queens)
     
-    return son_hal
+    return finale_state
 
-çaprazlar = set()
-vezirlerin_konumu = []
-yataylar = []
-yasaklı_kareler = set()
+crosses = set()
+positions_of_queens = []
+horizontals = []
+banned_pieces = set()
 
-deneme_sayısı = 0
-koyulacak_vezir_sayısı = 8
+num_of_attempt = 0
+num_of_queens_to_put = 8
 
-seçim_aralığı = list(range(1, 65))
+choice_range = list(range(1, 65))
 
-while koyulacak_vezir_sayısı > 0:
-    random_pos = rd.choice(seçim_aralığı)
-    if len(yasaklı_kareler) != 64:
-        if random_pos not in yasaklı_kareler:
-            yataylar.append(np.where(satranç_tahtası == random_pos)[0][0])
-            veziri_yerleştir(random_pos)
-            vezirlerin_konumu.append(random_pos)
+while num_of_queens_to_put > 0:
+    random_pos = rd.choice(choice_range)
+    if len(banned_pieces) != 64:
+        if random_pos not in banned_pieces:
+            horizontals.append(np.where(chess_board == random_pos)[0][0])
+            put_queen(random_pos)
+            positions_of_queens.append(random_pos)
             
-            koyulacak_vezir_sayısı -= 1
-            seçim_aralığı.remove(random_pos)
-            print("Vezir Yerleştirildi!")
+            num_of_queens_to_put -= 1
+            choice_range.remove(random_pos)
+            print("Queen placed successfully!")
     else:    
-        print("Başa Dönülüyor...")
-        print("Yerleştirilebilen vezir sayısı : {}".format(8 - koyulacak_vezir_sayısı))
-        vezirlerin_konumu.clear()
-        yasaklı_kareler.clear()
-        yataylar.clear()
-        koyulacak_vezir_sayısı = 8
-        deneme_sayısı += 1
-        seçim_aralığı = list(range(1, 65))
+        print("Returning to start...")
+        print("Successfully attempts : {}".format(8 - num_of_queens_to_put))
+        positions_of_queens.clear()
+        banned_pieces.clear()
+        horizontals.clear()
+        num_of_queens_to_put = 8
+        num_of_attempt += 1
+        choice_range = list(range(1, 65))
 
 
-print(satranç_kordinatına_dönüştür(yataylar, vezirlerin_konumu))
+print(convert_to_chess_coordinate(horizontals, positions_of_queens))
